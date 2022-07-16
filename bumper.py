@@ -87,14 +87,74 @@ def show_usage():
 
 
 
-def update_version_in_app_conf():
+def update_version_in_app_conf(dir_splunk_app_name):
     ic()
+    ic(dir_splunk_app_name)
+    path_app_conf = dir_add_slash(dir_splunk_app_name) + 'default/app.conf'
+    ic(path_app_conf)
+
+    path_app_conf_tmp = path_app_conf + '.tmp'
+    ic(path_app_conf_tmp)
+
+    if os.path.exists(path_app_conf):
+        ic(f'Found the app.conf file at {path_app_conf}')
+
+        ## Rename the app.conf file to app.conf.tmp
+        os.rename(path_app_conf, path_app_conf_tmp)
+
+        ## Open the conf.tmp; walk thru and show current version.
+        ## ask for new version and write to conf file.
+   
+        ## Write the the new app.conf
+        f_app = open(path_app_conf, 'w')
+
+        ## Read the app.conf.tmp from the original version.
+        f_tmp = open(path_app_conf_tmp, 'r')
+        for line in f_tmp:
+            line = line.strip()
+            print(line)
+            if 'version = ' in line:
+                print('CURRENT VERSION:')
+                print(line)
+                new_version = input('Enter new version: ')
+                f_app.write('version = ' + new_version + '\n')
+            else:
+                f_app.write(line + '\n')
+
+        f_tmp.close()
+        f_app.close()
+
+        ## Remove the app.conf.tmp file
+        os.remove(path_app_conf_tmp)
+    else:
+        print(f'ERROR: Missing app.conf file {path_app_conf}')
+
+    return new_version
 
 
 
-def copy_files_from_local_to_default():
+def copy_files_from_local_to_default(dir_splunk_app_name):
+    ##
+    ## Copy the files from the local directory to the default directory.
+    ## But only when the 'local/' version of the file is newer then the
+    ## 'default/' version of the same file.
+    ##
+    ## Input:
+    ##      dir_splunk_app_name:    Then directory that holds the default and local directories
+    ##                              /opt/splunk/etc/apps/appname
     ic()
+    
+    dir_local = dir_add_slash(dir_splunk_app_name) + 'local/'
+    dir_default = dir_add_slash(dir_splunk_app_name) + 'default/'
 
+    ## Rsync options used:
+    ##      --progress      show progress during transfer  
+    ##      --recursive     recurse into directories
+    ##      --update        skip files that are newer on the receiver
+    cmd = 'rsync --progress --recursive --update "' + dir_local + '" "' + dir_default + '"'
+    print(cmd)
+    ic(cmd)
+    
 
 
 def update_git_repo():
@@ -135,10 +195,11 @@ def main():
     ic(dir_splunk_app_name)
 
     ## 1) Update the version number in the apps.conf file; return new version number.
-    update_version_in_app_conf()
+    new_version = update_version_in_app_conf(dir_splunk_app_name)
+    ic(f'New version set in app.conf file {new_version}')
 
     ## 2) Copy all files from local/ to default/ for newer files that are changed.
-    copy_files_from_local_to_default()
+    copy_files_from_local_to_default(dir_splunk_app_name)
 
     ## 3) Update the git repo with all changes in this new version of the app.
     update_git_repo()
