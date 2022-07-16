@@ -82,6 +82,24 @@ def execute_cmd(command_line):
 
 
 
+def ensure_dir(dir):
+    ##
+    ## Make sure the directory is created.
+    ##
+    ## dir: Must end with a slash, otherwise this is not seen as a directory.
+    ##        /var/log/name  = /var/log is the directory
+    ##        /var/log/name/ = /var/log/name is the directory
+    ##
+    ic()
+    ic(dir)
+    directory = os.path.dirname(dir)
+    if not os.path.exists(directory):
+        try:
+            os.makedirs(directory)
+        except OSError as e:
+            ic(e.errno)
+
+
 def show_title():
     print(sys.argv[0].upper())
     print()
@@ -207,8 +225,35 @@ def update_git_repo(dir_splunk_app_name, new_version):
 
 
 
-def create_archive_file():
+def create_archive_file(config, dir_splunk_apps, splunk_app, new_version):
+    ##
+    ## Create an archive and compress the Splunk app dir into a new archive named
+    ## with the version number in the archive name.
+    ##
     ic()
+    ic(config, dir_splunk_apps, splunk_app, new_version)
+
+    dir_releases = config.get(get_script_name(), 'DirReleases')
+    ic(dir_releases)
+    
+    path_archive = dir_add_slash(dir_releases) + splunk_app + '_' + new_version + '.tar.gz'
+    ic(path_archive)
+
+    ensure_dir(path_archive)
+
+    ## Get the current working dir.
+    current_working_dir = os.getcwd()
+   
+    os.chdir(dir_splunk_apps)
+  
+    # 'tar cvzf ' + path_tar + ' --exclude=.git --exclude=local --exclude=DEV --exclude=do_bump_release.sh --exclude=.gitignore ' + app_name + '/'
+    cmd =  'tar cvzf "' + path_archive + '" --exclude=.git --exclude=.gitignore --exclude=local "' + dir_add_slash(splunk_app) + '"'
+    print(cmd)
+    ic(cmd)
+    execute_cmd(cmd)
+
+    ## Change back to the working directory
+    os.chdir(current_working_dir)
 
 
 
@@ -232,8 +277,7 @@ def main():
     config = configparser.ConfigParser()
     config.read(get_config_name())
 
-    script_name = get_script_name()
-    dir_splunk_apps = config.get(script_name, 'SplunkAppsDir')
+    dir_splunk_apps = config.get(get_script_name(), 'DirSplunkApps')
     ic(dir_splunk_apps)
 
     dir_splunk_app_name = dir_add_slash(dir_splunk_apps) + splunk_app
@@ -250,7 +294,7 @@ def main():
     update_git_repo(dir_splunk_app_name, new_version)
 
     ## 4) Create a compressed archive .tar.gz of the new file in a releases dir.
-    create_archive_file() 
+    create_archive_file(config, dir_splunk_apps, splunk_app, new_version) 
     
     print(f'End of script!')
 
