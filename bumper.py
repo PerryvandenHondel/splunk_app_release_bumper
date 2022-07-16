@@ -71,6 +71,17 @@ def dir_add_slash(dir):
 
 
 
+def execute_cmd(command_line):
+    ##
+    ## Run a command line
+    ##
+    
+    rc = os.system(command_line)
+    ic(f'command="execute_cmd" command_line="{command_line}" rc={rc}')
+    return rc
+
+
+
 def show_title():
     print(sys.argv[0].upper())
     print()
@@ -153,12 +164,46 @@ def copy_files_from_local_to_default(dir_splunk_app_name):
     ##      --update        skip files that are newer on the receiver
     cmd = 'rsync --progress --recursive --update "' + dir_local + '" "' + dir_default + '"'
     print(cmd)
-    ic(cmd)
+    rc = execute_cmd(cmd)
+    ic(rc)
     
 
 
-def update_git_repo():
+def update_git_repo(dir_splunk_app_name, new_version):
+    ##
+    ## Add new files to local repo and push to remote repo.
+    ## Use the new_version variable to mark the git commit.
+    ##
     ic()
+    ic(dir_splunk_app_name, new_version)
+
+    #print('GIT ACTIONS(): writing git actions to bash script.')
+    #fw.write('\n')
+    #fw.write('git add ' + path + '\n')
+    #fw.write('git commit -m "v' + version + '"\n')
+    #fw.write('git push\n')
+
+    ## Get the current working dir.
+    current_working_dir = os.getcwd()
+    ic(current_working_dir)
+
+    ## Change to the directory where the app is located.
+    os.chdir(dir_splunk_app_name)
+
+    cmd = 'git add .'
+    ic(cmd)
+    rc = execute_cmd(cmd)
+
+    cmd = 'git commit -m "v' + new_version + '"'
+    ic(cmd)
+    rc = execute_cmd(cmd)
+
+    cmd = 'git push'
+    ic(cmd)
+    rc = execute_cmd(cmd)
+
+    ## Change back to the working directory
+    os.chdir(current_working_dir)
 
 
 
@@ -202,7 +247,7 @@ def main():
     copy_files_from_local_to_default(dir_splunk_app_name)
 
     ## 3) Update the git repo with all changes in this new version of the app.
-    update_git_repo()
+    update_git_repo(dir_splunk_app_name, new_version)
 
     ## 4) Create a compressed archive .tar.gz of the new file in a releases dir.
     create_archive_file() 
