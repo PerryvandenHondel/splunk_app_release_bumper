@@ -1,7 +1,5 @@
 How to bump the release/version of a Splunk app using this script bumper.py
 
-[__TOC__]
-
 # CONFIGUREATION
 The configuration of the script is done through a .conf file.
 
