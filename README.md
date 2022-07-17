@@ -24,15 +24,15 @@ Add all files and directories to the .gitignore file that do not need to be in t
 # USAGE
 Run the script bumper.py with the name of the Splunk app that needs it's release/version number increased.
 
-'''
-> /home/perry/dev/python/bump_release/bumper.py [Splunk App Name]
-'''
+```
+/home/user/dev/python/bump_release/bumper.py [Splunk App Name]
+```
 
 Example:
 
-'''
-> /home/perry/dev/python/bump_release/bumper.py UMBRIO_SA_toexitnodes
-'''
+```
+> /home/user/dev/python/bump_release/bumper.py UMBRIO_SA_toexitnodes
+```
 
 # ACTIONS
 The script will perform the following actions:
