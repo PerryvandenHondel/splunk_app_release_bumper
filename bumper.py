@@ -247,7 +247,7 @@ def create_archive_file(config, dir_splunk_apps, splunk_app, new_version):
     os.chdir(dir_splunk_apps)
   
     # 'tar cvzf ' + path_tar + ' --exclude=.git --exclude=local --exclude=DEV --exclude=do_bump_release.sh --exclude=.gitignore ' + app_name + '/'
-    cmd =  'tar cvzf "' + path_archive + '" --exclude=.git --exclude=.gitignore --exclude=local "' + dir_add_slash(splunk_app) + '"'
+    cmd =  'tar cvzf "' + path_archive + '" --exclude=.git --exclude=.gitignore --exclude=local --exclude=DEV"' + dir_add_slash(splunk_app) + '"'
     print(cmd)
     ic(cmd)
     execute_cmd(cmd)
