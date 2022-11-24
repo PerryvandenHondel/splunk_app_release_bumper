@@ -41,3 +41,8 @@ The script will perform the following actions:
 1. Copy all files from local/ to default/ for newer files that are changed.
 1. Update the git repo with all changes in this new version of the app.
 1. Create a compressed archive .tar.gz of the new file in a releases dir.
+
+
+On the Splunk instance where the app is developed do a Debug Refresh to use the configs that are in the default dir.
+
+http://voyager:8000/en-GB/debug/refresh
