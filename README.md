@@ -1,4 +1,7 @@
-How to bump the release/version of a Splunk app using this script bumper.py
+How to bump the release/version of a Splunk app using this script 
+
+
+SPLUNK_APP_BUM_RELEASE.PY
 
 # CONFIGUREATION
 The configuration of the script is done through a .conf file.
@@ -6,42 +9,49 @@ The configuration of the script is done through a .conf file.
 Options
 - DirSplunkApps: Directory where Splunk Apps are located
 - DirReleases: Directory where to store the created archives of Splunk Apps
+- DirTemp: A Directory to store the files in for the run of the script 
 
-Example configuration bumper.conf
+Example configuration splunk_app_bum_release.conf
 
 ```
-[bumper]
+[settings]
 ## Directory where Splunk Apps are located.
 DirSplunkApps=/opt/splunk/etc/apps/
 
 ## Directory where to store the created archives of Splunk Apps.
 DirReleases=/home/perry/dev/Splunk_Apps_Releases
+
+DirTemp=/tmp
+
 ```
 
 # GITIGNORE
 Add all files and directories to the .gitignore file that do not need to be in the repo.
 
 # USAGE
-Run the script bumper.py with the name of the Splunk app that needs it's release/version number increased.
+
+1) Configure the .conf file with your settings.
+
+2) Run the script splunk_app_bum_release.py with the name of the Splunk app that needs it's release/version number increased.
 
 ```
-/home/user/dev/python/bump_release/bumper.py [Splunk App Name]
+splunk_app_bump_release.py [Splunk App Name]
 ```
 
 Example:
 
 ```
-> /home/user/dev/python/bump_release/bumper.py UMBRIO_SA_toexitnodes
+> splunk_app_bump_release.py UMBRIO_SA_toexitnodes
 ```
 
 # ACTIONS
 The script will perform the following actions:
 
 1. Update the version number in the apps.conf file
-1. Copy all files from local/ to default/ for newer files that are changed.
-1. Update the git repo with all changes in this new version of the app.
-1. Create a compressed archive .tar.gz of the new file in a releases dir.
-
+2. Updates the repo if the app is under source controle. Commit messag with "Release vX.X.X"
+3. Makes a copy of the whole app to the temp dir.
+4. Renames local/ to default/ directory
+5. Create a compressed archive .tar.gz of the new file in the releases dir.
 
 On the Splunk instance where the app is developed do a Debug Refresh to use the configs that are in the default dir.
 
